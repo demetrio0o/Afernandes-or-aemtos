@@ -1,0 +1,65 @@
+name: Gerar programa (PC) e APK (celular)
+
+on:
+  workflow_dispatch:        # botão "Run workflow" na aba Actions
+  push:
+    tags: ['v*']            # ao criar uma tag como v1.0.0, também publica em Releases
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    name: Programa para Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - run: npm run build:win
+      - uses: actions/upload-artifact@v4
+        with:
+          name: A-Fernandes-Windows
+          path: |
+            dist/*.exe
+          if-no-files-found: error
+
+  android:
+    name: APK para Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: android-actions/setup-android@v3
+      - run: npm install
+      - run: npm run prepare-www
+      - run: npx cap add android
+      - run: npm run android:assets
+      - run: npx cap sync android
+      - name: Compilar APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+      - name: Renomear APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk A-Fernandes-Orcamentos.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: A-Fernandes-Android
+          path: A-Fernandes-Orcamentos.apk
+          if-no-files-found: error
+
+  release:
+    name: Publicar em Releases
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: arquivos, merge-multiple: true }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: arquivos/*
+          generate_release_notes: true
