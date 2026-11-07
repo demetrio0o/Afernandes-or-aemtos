@@ -1,0 +1,57 @@
+{
+  "name": "a-fernandes-orcamentos",
+  "productName": "A Fernandes Orçamentos",
+  "version": "1.0.0",
+  "description": "Orçamentos de serviços e materiais - A Fernandes",
+  "author": "A Fernandes",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "prepare-www": "node scripts/prepare-www.js",
+    "start": "npm run prepare-www && electron .",
+    "build:win": "npm run prepare-www && electron-builder --win --publish never",
+    "android:add": "npx cap add android",
+    "android:assets": "npx capacitor-assets generate --android",
+    "android:sync": "npm run prepare-www && npx cap sync android",
+    "android:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/share": "^7.0.0",
+    "@fontsource-variable/montserrat": "^5.1.0",
+    "@fontsource-variable/public-sans": "^5.1.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.0.0",
+    "electron": "^35.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.afernandes.orcamentos",
+    "productName": "A Fernandes Orçamentos",
+    "executableName": "A Fernandes Orcamentos",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["electron/**/*", "www/**/*", "build/icon.png", "package.json"],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "A Fernandes Orçamentos"
+    },
+    "artifactName": "A-Fernandes-Orcamentos-${version}-${os}-${arch}.${ext}"
+  }
+}

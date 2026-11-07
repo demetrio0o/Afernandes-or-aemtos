@@ -1,0 +1,9 @@
+{
+  "appId": "com.afernandes.orcamentos",
+  "appName": "A Fernandes Orçamentos",
+  "webDir": "www",
+  "backgroundColor": "#000000",
+  "android": {
+    "allowMixedContent": false
+  }
+}
